@@ -371,6 +371,7 @@ class Park_Data():
         race -= 1
         itemcount = 0
 
+        starts = []
         prediction = {}
         
         for item in self.tables[race]["Horse"]:
@@ -395,6 +396,7 @@ class Park_Data():
                 print ("")
                 pass
             try:
+                starts.append(len(self.tables[race]['Horse'][itemcount].df.Finish))
                 print(str(len(self.tables[race]['Horse'][itemcount].df.Finish)) + " Starts")
                 print(str(self.tables[race]['Horse'][itemcount].win_percent) + "% Win")
                 print(str(self.tables[race]['Horse'][itemcount].place_percent) + "% Place or Better")
@@ -430,6 +432,7 @@ class Park_Data():
         print("")
         print("---------------------------------------------------------------")
         print(str(max(prediction.items(), key=operator.itemgetter(1))[0]) + " To Win")
+        print(str(statistics.median(starts)) + " Median Horse Starts")
 
     def get_data(self):
         
@@ -572,7 +575,7 @@ while raceagain == True:
     else:
         raceagain = True
        
-##quit()
+quit()
 
 ##try:
 ##    date = str(input("What is the race date? example '2021-02-11' "))
