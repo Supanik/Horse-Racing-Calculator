@@ -5,7 +5,6 @@ import datetime
 import time
 import sqlite3
 import statistics
-import operator
 
 class Horse():
 
@@ -365,15 +364,15 @@ class Park_Data():
         race = int(input("What race? "))
         print("---------------------------------------------------------------")
         print("")
-        self.get_contestant_data(race)
+##        self.get_contestant_data(race)
 
-    def get_contestant_data(self, race = 2, jockeyvalue = 1, horsevalue = 1, trainervalue = 1, ppvalue = 1):
+    def get_contestant_data(self, race = 2, jockeyvalue = 1, horsevalue = 1, trainervalue = 1):
         race -= 1
         itemcount = 0
-
-        starts = []
-        prediction = {}
-        
+        jockeyvalue = 1
+        horsevalue = 1
+        trainervalue = 1
+        ppvalue = 1
         for item in self.tables[race]["Horse"]:
             self.tables[race]['Horse'][itemcount]= Horse(str(item))
             try:
@@ -387,16 +386,13 @@ class Park_Data():
                 placescore = ((self.tables[race]['Horse'][itemcount].place_percent * horsevalue) + (self.tables[race]['Jockey'][itemcount].place_percent * jockeyvalue) / 2)
                 showscore = ((self.tables[race]['Horse'][itemcount].show_percent * horsevalue) + (self.tables[race]['Jockey'][itemcount].show_percent * jockeyvalue) / 2)
                 aggregatescore = round(statistics.mean([winscore, placescore, showscore]),2)
-                prediction[self.tables[race]['Horse'][itemcount].name] = aggregatescore
-##                print(str(aggregatescore) + " Prediction Score")
-                print(str(prediction[self.tables[race]['Horse'][itemcount].name]) + " Prediction Score")
+                print(str(aggregatescore) + " Prediction Score")
                 print("")
             except:
                 print ("No Prediction Data")
                 print ("")
                 pass
             try:
-                starts.append(len(self.tables[race]['Horse'][itemcount].df.Finish))
                 print(str(len(self.tables[race]['Horse'][itemcount].df.Finish)) + " Starts")
                 print(str(self.tables[race]['Horse'][itemcount].win_percent) + "% Win")
                 print(str(self.tables[race]['Horse'][itemcount].place_percent) + "% Place or Better")
@@ -420,19 +416,6 @@ class Park_Data():
             print("---------------------------------------------------------------")
             itemcount += 1
             time.sleep(2)
-        
-        print("Race " + str(race + 1) + " Results")
-        try:
-            print("Win- " + self.placestables[race]["Win"])
-            print("Place- " + self.placestables[race]["Place"])
-            print("Show- " + self.placestables[race]["Show"])
-            
-        except:
-            print("No Results")
-        print("")
-        print("---------------------------------------------------------------")
-        print(str(max(prediction.items(), key=operator.itemgetter(1))[0]) + " To Win")
-        print(str(statistics.median(starts)) + " Median Horse Starts")
 
     def get_data(self):
         
@@ -466,8 +449,7 @@ class Park_Data():
                 self.places = {"Win":"", "Place":"", "Show":""}
                 
             except:
-##                print ("error getting race results or no results")
-                pass
+                print ("error getting race results")
             
             for found in item.findAll("h4"):
                 self.table["Horse"].append(found.text)
@@ -481,41 +463,24 @@ class Park_Data():
                 self.table["Jockey"].append(foundlist.pop(0).text)
                 self.table["ML"].append(foundlist.pop(0).text)
                 del foundlist[0]
+
+##            foundlist = []
+##            for found in item.findAll("td"):
+##                foundlist.append(found)
+##
+##            del foundlist[0:1]
+##            while len(foundlist) > 0:
+##                self.table["PP"].append(foundlist.pop(0).text)
+##                try:
+##                    del foundlist[0:6]
+##                except:
+##                    pass
             
             
             self.tables.append(self.table)
             self.table = {"P#":[],"PP":[],"Horse":[],"A/S":[],"Med/EQ":[],"Jockey":[],"WGT":[],"Trainer":[],"ML":[]}
-            listloc += 1
+            listloc += 1                      
 
-            placecount = -1
-            
-            for table in self.placestables:
-                placecount += 1
-                for item in table:
-                    tempitem = ""
-                    spacecount = False
-                    toggle = False
-                    charlist = ["'", ".", ",", " ", "\n"]
-                    
-                    for letter in self.placestables[placecount][item]:
-                        if letter == " " and spacecount == True:
-                            spacecount = False
-                            toggle = True
-                        if letter not in charlist:
-                            spacecount = False
-                            tempitem = tempitem + letter
-
-                        if spacecount == False and letter == " " and toggle == False:
-                            tempitem = tempitem + letter
-                            spacecount = True
-
-                        toggle = False
-
-
-                    self.placestables[placecount][item] = tempitem
-                    if self.placestables[placecount][item][-1] in charlist:
-                        self.placestables[placecount][item] = self.placestables[placecount][item][:-1]
-                
     def clean_names(self):
 
         for table in self.tables:
@@ -545,7 +510,6 @@ class Park_Data():
 
 
                     table[key][itemcount] = tempitem
-                        
                     
 
 sql = sqlite3.connect("horses.db")
@@ -557,33 +521,33 @@ print("")
 
 raceagain = True
 
-while raceagain == True:
-    
-    try:
-        date = str(input("What is the race date? example '2021-02-11' "))
-        park = str(input("What is the name of the Park? "))
-        print("")
-        races = Park_Data(date, park)
-    except:
-        print("Invalid Data")
-
-    raceagain = str(input("Do you want to calculate another race? 'y' or 'n' "))
-    print("")
-
-    if raceagain == "n":
-        raceagain = False
-    else:
-        raceagain = True
-       
-quit()
-
-##try:
-##    date = str(input("What is the race date? example '2021-02-11' "))
-##    park = str(input("What is the name of the Park? "))
+##while raceagain == True:
+##    
+##    try:
+##        date = str(input("What is the race date? example '2021-02-11' "))
+##        park = str(input("What is the name of the Park? "))
+##        print("")
+##        races = Park_Data(date, park)
+##    except:
+##        print("Invalid Data")
+##
+##    raceagain = str(input("Do you want to calculate another race? 'y' or 'n' "))
 ##    print("")
-##    races = Park_Data(date, park)
-##except Exception as e:
-##    print(e)
+##
+##    if raceagain == "n":
+##        raceagain = False
+##    else:
+##        raceagain = True
+##       
+##quit()
+
+try:
+    date = str(input("What is the race date? example '2021-02-11' "))
+    park = str(input("What is the name of the Park? "))
+    print("")
+    races = Park_Data(date, park)
+except:
+    print("Invalid Data")
 
 
 
